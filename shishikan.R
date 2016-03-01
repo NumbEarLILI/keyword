@@ -1,0 +1,19 @@
+dm1=dm1[,-2953]
+dm2=dm2[,-1]
+dm3=dm3[,-1]
+data=read.csv("F:/final/seg.csv",header=T,dec=".")
+data$line=as.factor(paste(data[,2],"-",data[,3]))
+line=levels(data$line)
+data$z=as.factor(ifelse(data$y>10,"+2",
+                        ifelse(data$y>0,"+1",
+                               ifelse(data$y>-0.8,"-1","-2"))))
+hat=function(i,k,lambda){
+  d=apply(matrix(1:30311),1,
+          function(j){dm1[which(line==data$line[i]),which(line==data$line[j])]*lambda+
+                        dm2[data$V3[i],data$V3[j]]+
+                        dm3[data$V4[i],data$V4[j]]})
+  nb=setdiff(which(d<sort(d)[k+2]),i)
+  nbz=data$z[nb]
+  yy=mean(data$y[intersect(nb,which(data$z==names(which.max(table(nbz)))))])
+  c(yy,names(which.max(table(nbz))))
+}
